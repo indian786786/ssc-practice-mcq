@@ -3,62 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice MCQ</title>
+    <title>SSC QUIZ</title>
     <script>
-        let currentQuestionIndex = 0;
-        let questions = [];
+        document.addEventListener('DOMContentLoaded', function () {
+            const fetchData = async () => {
+                try {
+                    const response = await fetch('your_api_endpoint'); // Replace with actual API endpoint
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    renderUI(data);
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                }
+            };
 
-        function fetchQuestions() {
-            fetch('path_to_your_api')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    questions = data;
-                    displayQuestion();
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                    alert('Failed to load questions. Please try again later.');
+            const renderUI = (data) => {
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = ''; // Clear previous content
+                data.forEach(item => {
+                    const button = document.createElement('button');
+                    button.innerText = item.question;
+                    button.onclick = () => handleButtonClick(item);
+                    container.appendChild(button);
                 });
-        }
+            };
 
-        function displayQuestion() {
-            if (questions.length === 0) return;
-            const question = questions[currentQuestionIndex];
-            document.getElementById('question').innerText = question.question;
-            // Code to display options
-            document.getElementById('explanation').innerText = question.explanation;
-            document.getElementById('counter').innerText = `Q${currentQuestionIndex + 1} of ${questions.length}`;
-        }
+            const handleButtonClick = (item) => {
+                alert(`You clicked on: ${item.question}`); // Example functionality
+            };
 
-        function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
-            }
-        }
-
-        function skipQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
-            }
-        }
-
-        window.onload = fetchQuestions;
+            fetchData();
+        });
     </script>
 </head>
 <body>
-    <h1>Multiple Choice Questions</h1>
-    <div id="question"></div>
-    <div id="options"></div>
-    <div id="explanation"></div>
-    <div id="counter"></div>
-    <button onclick="nextQuestion()">Next</button>
-    <button onclick="skipQuestion()">Skip</button>
+    <h1>Welcome to the SSC Quiz</h1>
+    <div id="quiz-container"></div>
 </body>
 </html>
