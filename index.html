@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SSC Practice MCQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  background:#0b1533;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+.option {
+  border:1px solid #444;
+  padding:12px;
+  margin-top:10px;
+  cursor:pointer;
+}
+.correct { background:#1e7f3b; }
+.wrong { background:#8b1e1e; }
+#log {
+  background:#111;
+  padding:10px;
+  margin-top:10px;
+  white-space:pre-wrap;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>SSC Practice MCQ (Diagnostic)</h2>
+
+<input id="topic" placeholder="Enter topic (e.g. Lodi dynasty)">
+<button onclick="start()">Start</button>
+
+<div id="quiz"></div>
+<div id="explanation"></div>
+<div id="log"></div>
+
+<script>
+const WORKER_URL = "https://canvas-ai.saififiroza786.workers.dev/";
+
+let questions = [];
+let index = 0;
+
+async function start() {
+  const topic = document.getElementById("topic").value.trim();
+  document.getElementById("quiz").innerHTML = "Loading questions...";
+  document.getElementById("log").innerText = "";
+
+  try {
+    const res = await fetch("https://canvas-ai.saififiroza786.workers.dev/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ topic })
+});
+
+    const text = await res.text();
+    document.getElementById("log").innerText =
+      "RAW RESPONSE:\\n" + text;
+
+    const data = JSON.parse(text);
+    questions = data;
+    index = 0;
+    show();
+  } catch (e) {
+    document.getElementById("quiz").innerHTML = "❌ Error";
+    document.getElementById("log").innerText +=
+      "\\nERROR:\\n" + e.message;
+  }
+}
+
+function show() {
+  const q = questions[index];
+  if (!q) {
+    document.getElementById("quiz").innerHTML = "No questions found";
+    return;
+  }
+
+  let html = `<h3>${q.question}</h3>`;
+  q.options.forEach((o,i)=>{
+    html += `<div class="option" onclick="ans(${i})">${o}</div>`;
+  });
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function ans(i) {
+  const q = questions[index];
+  const opts = document.querySelectorAll(".option");
+  opts.forEach(o=>o.onclick=null);
+
+  if (i === q.answer) {
+    opts[i].classList.add("correct");
+  } else {
+    opts[i].classList.add("wrong");
+    opts[q.answer].classList.add("correct");
+  }
+
+  document.getElementById("explanation").innerHTML =
+    "<b>Explanation:</b> " + q.explanation;
+}
+</script>
+
+</body>
+</html>
